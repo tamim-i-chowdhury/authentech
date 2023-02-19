@@ -6,12 +6,17 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   sendEmailVerification,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { toast } from "react-toastify";
 
 const auth = getAuth(app);
 
 const Register = () => {
+  const googleProvider = new GoogleAuthProvider();
+
+  // Sign up with Email and Password
   const handleSubmit = (event) => {
     event.preventDefault();
     const form = event.target;
@@ -51,6 +56,18 @@ const Register = () => {
           });
       })
       .catch((error) => console.log(error));
+  };
+
+  // Sign In with Google
+  const handleGoogleSignIn = () => {
+    signInWithPopup(auth, googleProvider)
+      .then((result) => {
+        const user = result.user;
+        console.log(user);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -127,7 +144,11 @@ const Register = () => {
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
         <div className="flex justify-center space-x-4">
-          <button aria-label="Log in with Google" className="p-3 rounded-sm">
+          <button
+            onClick={handleGoogleSignIn}
+            aria-label="Log in with Google"
+            className="p-3 rounded-sm"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
