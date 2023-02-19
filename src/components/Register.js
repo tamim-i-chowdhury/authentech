@@ -1,20 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import app from "../firebase/firebase.init";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  sendEmailVerification,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
 import { toast } from "react-toastify";
-
-const auth = getAuth(app);
+import { AuthContext } from "../contexts/UserContext";
 
 const Register = () => {
-  const googleProvider = new GoogleAuthProvider();
+  const { createUser, updateName, verifyEmail, signInWithGoogle } =
+    useContext(AuthContext);
 
   // Sign up with Email and Password
   const handleSubmit = (event) => {
@@ -25,21 +16,18 @@ const Register = () => {
     const password = form.password.value;
 
     // Account created
-    createUserWithEmailAndPassword(auth, email, password)
+    createUser(email, password)
       .then((result) => {
         const user = result.user;
-        console.log(result.user);
+        console.log(user);
 
         // Profile updated!
-        updateProfile(auth.currentUser, {
-          displayName: name,
-        })
+        updateName(name)
           .then(() => {
             toast.success("Display name updated...");
-            console.log(auth.currentUser.displayName);
 
             // Email verification
-            sendEmailVerification(auth.currentUser)
+            verifyEmail()
               .then(() => {
                 toast.success(
                   "A verification email has been sent to your email..."
@@ -60,10 +48,9 @@ const Register = () => {
 
   // Sign In with Google
   const handleGoogleSignIn = () => {
-    signInWithPopup(auth, googleProvider)
+    signInWithGoogle()
       .then((result) => {
         const user = result.user;
-        console.log(user);
       })
       .catch((error) => {
         console.error(error);
