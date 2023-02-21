@@ -1,9 +1,10 @@
 import { useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../contexts/UserContext";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const { user, logOut } = useContext(AuthContext);
   console.log(user);
 
@@ -12,6 +13,7 @@ const Navbar = () => {
       .then(() => {
         // Sign-out successful.
         toast.warning("User successfully sign out.");
+        navigate("/");
       })
       .catch((error) => {
         // An error happened.

@@ -1,16 +1,77 @@
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { AuthContext } from "../contexts/UserContext";
 
 const Login = () => {
+  const [resetEmail, setResetEmail] = useState("");
+  const { signIn, signInWithGoogle, resetPassword } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+  console.log(from);
+
+  // Sign in with Email and Password
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const form = event.target;
+    const email = form.email.value;
+    const password = form.password.value;
+
+    signIn(email, password)
+      .then((result) => {
+        // Signed in
+        const user = result.user;
+        console.log(user);
+        toast.success("Login Success!");
+        navigate(from, { replace: true });
+        // ...
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
+
+  // Sign In with Google
+  const handleGoogleSignIn = () => {
+    signInWithGoogle()
+      .then((result) => {
+        const user = result.user;
+        console.log(user);
+        navigate(from, { replace: true });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  // Reset Password with Email
+
+  const handleResetPassword = () => {
+    // console.log(resetEmail);
+    // console.log();
+    resetPassword(resetEmail)
+      .then(() => {
+        // Password reset email sent!
+        toast.success("Password reset email has been sent, check your email.");
+      })
+      .catch((error) => {
+        toast.error(error.message);
+      });
+  };
+
   return (
     <div className="flex justify-center items-center pt-8">
       <div className="flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900">
         <div className="mb-8 text-center">
-          <h1 className="my-3 text-4xl font-bold">Sign in</h1>
+          <h1 className="my-3 text-4xl font-bold">Login</h1>
           <p className="text-sm text-gray-400">
-            Sign in to access your account
+            Login in to access your account
           </p>
         </div>
         <form
+          onSubmit={handleSubmit}
           noValidate=""
           action=""
           className="space-y-6 ng-untouched ng-pristine ng-valid"
@@ -21,6 +82,7 @@ const Login = () => {
                 Email address
               </label>
               <input
+                onBlur={(event) => setResetEmail(event.target.value)}
                 type="email"
                 name="email"
                 id="email"
@@ -55,7 +117,10 @@ const Login = () => {
           </div>
         </form>
         <div className="space-y-1">
-          <button className="text-xs hover:underline text-gray-400">
+          <button
+            onClick={handleResetPassword}
+            className="text-xs hover:underline text-gray-400"
+          >
             Forgot password?
           </button>
         </div>
@@ -67,7 +132,11 @@ const Login = () => {
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
         <div className="flex justify-center space-x-4">
-          <button aria-label="Log in with Google" className="p-3 rounded-sm">
+          <button
+            onClick={handleGoogleSignIn}
+            aria-label="Log in with Google"
+            className="p-3 rounded-sm"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 32 32"
